@@ -10,7 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.support.v4.widget.DrawerLayout;
 
-import app.bandit.navigationdrawertemplate.R;
+import app.bandit.reminderApp.R;
 
 /**
  *

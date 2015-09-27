@@ -15,7 +15,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import app.bandit.navigationdrawertemplate.R;
+import app.bandit.reminderApp.R;
 
 /**
  * A fragment containing a list view of upcoming reminders.

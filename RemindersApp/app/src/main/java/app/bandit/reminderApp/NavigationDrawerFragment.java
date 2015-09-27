@@ -22,7 +22,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import app.bandit.navigationdrawertemplate.R;
+import app.bandit.reminderApp.R;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
