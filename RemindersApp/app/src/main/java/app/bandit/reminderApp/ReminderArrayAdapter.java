@@ -34,7 +34,7 @@ public class ReminderArrayAdapter extends ArrayAdapter<Reminder> {
         // Populate the data into the template view using the data object
         title.setText(reminder.getTitle());
         monthDay.setText(reminder.getMonthDay() + ",");
-        hourMinute.setText(reminder.getTime());
+        hourMinute.setText(reminder.getTimeOfDay());
 
         // Return the completed view to render on screen
         return convertView;

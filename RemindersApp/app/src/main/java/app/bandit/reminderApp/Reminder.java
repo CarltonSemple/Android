@@ -116,6 +116,28 @@ public class Reminder {
     }
 
     public String getTimeOfDay() {
-        
+        StringBuilder sb = new StringBuilder();
+
+        if(hour > 12) {
+            sb.append(hour - 12);
+        } else {
+            sb.append(hour);
+        }
+
+        sb.append(':');
+        if(minute < 10) {
+            sb.append('0');
+            sb.append(minute);
+        } else {
+            sb.append(minute);
+        }
+
+        if(hour < 13) {
+            sb.append(" AM");
+        } else {
+            sb.append(" PM");
+        }
+
+        return sb.toString();
     }
 }
