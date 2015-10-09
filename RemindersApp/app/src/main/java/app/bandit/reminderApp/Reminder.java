@@ -9,11 +9,22 @@ public class Reminder {
     private int day;
     private int hour;
     private int minute;
-    private String title;
-    private String details; // extra
+    private StringBuilder title;
+    private StringBuilder details; // extra
     private ReminderStatus status;
     private Boolean repeat;
 
+    public Reminder() {
+        year = 0;
+        month = 0;
+        day = 0;
+        hour = 0;
+        minute = 0;
+        title = new StringBuilder();
+        details = new StringBuilder();
+        status = ReminderStatus.UPCOMING;
+        repeat = false;
+    }
 
     public Reminder(int yp, int mp, int dp, int hp, int minp, String tp, String det, String stat, boolean reepeet) {
         year = yp;
@@ -21,8 +32,8 @@ public class Reminder {
         day = hp;
         hour = hp;
         minute = minp;
-        title = tp;
-        details = det;
+        title = new StringBuilder(tp);
+        details = new StringBuilder(det);
         if(stat.equals("upcoming")) {
             status = ReminderStatus.UPCOMING;
         } else if (stat.equals("past")) {
@@ -32,7 +43,11 @@ public class Reminder {
     }
 
     public String getTitle() {
-        return title;
+        return title.toString();
+    }
+
+    public String getDetails() {
+        return details.toString();
     }
 
     public int getYear() {
@@ -53,6 +68,38 @@ public class Reminder {
 
     public int getMinute() {
         return minute;
+    }
+
+    public Boolean getRepeat() {
+        return repeat;
+    }
+
+    public void setYear(int y) {
+        this.year = y;
+    }
+
+    public void setMonth(int m) {
+        this.month = m;
+    }
+
+    public void setDay(int d) {
+        this.day = d;
+    }
+
+    public void setHour(int h) {
+        this.hour = h;
+    }
+
+    public void setMinute(int min) {
+        this.minute = min;
+    }
+
+    public void setTitle(String titl) {
+        this.title = new StringBuilder(titl);
+    }
+
+    public void setDetails(String detai) {
+        this.details = new StringBuilder(detai);
     }
 
     public String getStatus() {
