@@ -2,6 +2,10 @@ package app.bandit.reminderApp;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.app.job.JobInfo;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.os.PersistableBundle;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -22,13 +26,18 @@ import com.couchbase.lite.Manager;
 import com.couchbase.lite.android.AndroidContext;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import app.bandit.reminderApp.R;
+import app.bandit.reminderApp.background.ReminderService;
+import app.bandit.reminderApp.fileIO.JobFileManager;
 
 public class CreateReminderActivity extends ActionBarActivity implements View.OnClickListener {
 
@@ -40,6 +49,14 @@ public class CreateReminderActivity extends ActionBarActivity implements View.On
     final String TAG = "CreateReminderActivity";
 
     private Reminder reminder;
+
+    /* background service */
+
+    // component to signify the service class that receives the job scheduler callbacks
+    ComponentName mServiceComponent;
+    public static JobFileManager jobManager;
+    /** Service object to interact with scheduled jobs **/
+    private ReminderService rService;
 
     /*
      * Set up date picker
@@ -67,6 +84,8 @@ public class CreateReminderActivity extends ActionBarActivity implements View.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_reminder);
+
+        jobManager = new JobFileManager(getFilesDir());
 
         titleEdit = (EditText) findViewById(R.id.titleEditView);
         dateText = (EditText) findViewById(R.id.dateText);
@@ -145,6 +164,9 @@ public class CreateReminderActivity extends ActionBarActivity implements View.On
                 break;
             case R.id.submitButton:
                 submitToDatabase();
+                // Go back to the Main Activity
+                Intent intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
                 break;
         }
     }
@@ -222,7 +244,7 @@ public class CreateReminderActivity extends ActionBarActivity implements View.On
     }
 
 
-    protected void submitToDatabase() {
+    private void submitToDatabase() {
         // create an object that contains data for a document
         Map<String, Object> docContent = new HashMap<String, Object>();
         docContent.put("year", reminder.getYear());
@@ -247,6 +269,62 @@ public class CreateReminderActivity extends ActionBarActivity implements View.On
             System.out.println();
         } catch (CouchbaseLiteException e) {
             Log.e(TAG, "error writing document to database");
+        }
+
+        // Set the job even if the database fails, so at least the notification will pop up
+        try {
+            scheduleReminder(document.getId(), reminder.getTitle(), reminder.getDetails(), reminder.getTimeMillis());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Set reminder notification
+    private void scheduleReminder(String id, String title, String details, Long remindTimeMillis) {
+        rService = new ReminderService(getApplicationContext());
+        mServiceComponent = new ComponentName(this, ReminderService.class);
+
+        int count = jobManager.incrementCount();
+        if(count >= 0) {
+            JobInfo.Builder builder = new JobInfo.Builder(count, mServiceComponent);
+
+            Long delay = calculateTimeDelay(remindTimeMillis);
+            builder.setMinimumLatency(delay - 60000);
+            builder.setOverrideDeadline(delay);//70000);
+
+            // Send details about reminder to the scheduled job
+            PersistableBundle params = new PersistableBundle();
+            params.putString("id", id);
+            params.putString("title", title);
+            // limit content detail to 140 characters
+            StringBuilder sb = new StringBuilder(details);
+            if(sb.length() > 140) {
+                sb.setLength(140);
+            }
+            params.putString("details", details);
+            builder.setExtras(params);
+
+            rService.scheduleJob(builder.build());
+            int i = 0;
+            i++;
+        } else {
+            // throw exception here
+        }
+    }
+
+    /**
+     * Get the difference between the desired time and the current time
+     * @param destinationTime - long. time in millis
+     * @return
+     */
+    private Long calculateTimeDelay(Long destinationTime) {
+        java.util.Date cur = new GregorianCalendar().getTime();
+        TimeZone zone = Calendar.getInstance().getTimeZone();
+        Long current = cur.getTime();// + zone.getOffset(Calendar.getInstance().getTimeInMillis());
+        if(destinationTime < current) {
+            return -1L;
+        } else {
+            return destinationTime - current;
         }
     }
 }
