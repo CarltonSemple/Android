@@ -5,10 +5,13 @@
     <!--<style name="AppTheme" parent="android:Theme.Material">-->
 
         <!-- action bar color -->
-        <item name="colorPrimary">#F2FFFF</item>
+        <item name="colorPrimary">#FFFFFF</item>
 
-        <item name="android:textColorPrimary">#757575</item>
+        <item name="android:textColorPrimary">#000000</item>
         <item name="actionBarTheme">@style/ThemeOverlay.AppCompat.ActionBar</item>
+
+        <!-- navigation bar -->
+        <item name="android:activatedBackgroundIndicator">@drawable/drawer_list_selector</item>
     </style>
 
 

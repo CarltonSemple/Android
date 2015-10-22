@@ -13,13 +13,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.widget.Button;
 
 import app.bandit.reminderApp.R;
+import app.bandit.reminderApp.floatingactionbuttonbasic.FloatingActionButton;
 
 /**
  *
  * Created by Carlton Semple on 9/27/2015.
  */
 public class MainActivity extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, View.OnClickListener {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, View.OnClickListener, FloatingActionButton.OnCheckedChangeListener {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -40,6 +41,7 @@ public class MainActivity extends ActionBarActivity
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+
         mTitle = getTitle();
 
 
@@ -70,8 +72,10 @@ public class MainActivity extends ActionBarActivity
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         /* Set up click listeners for buttons */
-        Button createButton = (Button)findViewById(R.id.createButton);
-        createButton.setOnClickListener(this);
+        //Button createButton = (Button)findViewById(R.id.createButton);
+        //createButton.setOnClickListener(this);
+        FloatingActionButton fab1 = (FloatingActionButton) findViewById(R.id.fab_1);
+        fab1.setOnCheckedChangeListener(this);
     }
 
     /**
@@ -103,8 +107,9 @@ public class MainActivity extends ActionBarActivity
                 break;
         }
 
-        if(mDrawerToggle != null)
+        if(mDrawerToggle != null) {
             mDrawerToggle.syncState();
+        }
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
     }
@@ -191,12 +196,29 @@ public class MainActivity extends ActionBarActivity
      * @param v
      */
     public void onClick(View v){
-        switch (v.getId()){
-
+        switch (v.getId()){/*
             case R.id.createButton:
                 // Start activity without passing any variables
                 Intent intent = new Intent(this, CreateReminderActivity.class);
                 startActivity(intent);
+                break;*/
+        }
+    }
+
+    /**
+     * Handle when the Floating Action Button is checked.  Go to the create reminder activity
+     * @param fabView   The FAB view whose state has changed.
+     * @param isChecked The new checked state of buttonView.
+     */
+    @Override
+    public void onCheckedChanged(FloatingActionButton fabView, boolean isChecked) {
+        // When a FAB is toggled, log the action.
+        switch (fabView.getId()){
+            case R.id.fab_1:
+                // Start activity without passing any variables
+                Intent intent = new Intent(this, CreateReminderActivity.class);
+                startActivity(intent);
+            default:
                 break;
         }
     }
