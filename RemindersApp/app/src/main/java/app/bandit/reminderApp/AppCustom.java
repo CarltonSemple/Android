@@ -1,6 +1,9 @@
 package app.bandit.reminderApp;
 
 import android.app.Application;
+import android.app.job.JobInfo;
+import android.content.ComponentName;
+import android.os.PersistableBundle;
 import android.util.Log;
 
 import com.couchbase.lite.CouchbaseLiteException;
@@ -16,6 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import app.bandit.reminderApp.background.ReminderService;
+import app.bandit.reminderApp.fileIO.JobFileManager;
+
 /**
  * Can be used to run code on application start up
  *
@@ -25,7 +31,18 @@ public class AppCustom extends Application {
 
     private Manager manager;
     private Database db;
-    final String TAG = "AppCustom";
+    private final String TAG = "AppCustom";
+
+    /* background service */
+
+    // component to signify the service class that receives the job scheduler callbacks
+    ComponentName mServiceComponent;
+
+    public static JobFileManager jobManager;
+    /** Service object to interact with scheduled jobs **/
+    ReminderService rService;
+
+
 
     /*
      * Called only once.
@@ -45,6 +62,28 @@ public class AppCustom extends Application {
         setupDatabaseViews();
 
         Log.i(TAG, "onCreate fired");
+
+        jobManager = new JobFileManager(getFilesDir());
+        //createBackgroundService();
+    }
+
+    public void createBackgroundService() {
+        rService = new ReminderService(getApplicationContext());
+        mServiceComponent = new ComponentName(this, ReminderService.class);
+
+        int count = jobManager.incrementCount();
+        if(count >= 0) {
+            JobInfo.Builder builder = new JobInfo.Builder(count, mServiceComponent);
+            builder.setMinimumLatency(10000);
+            builder.setOverrideDeadline(70000);
+
+            PersistableBundle params = new PersistableBundle();
+
+            rService.scheduleJob(builder.build());
+            int i = 0;
+        } else {
+            // throw exception here
+        }
     }
 
     /*

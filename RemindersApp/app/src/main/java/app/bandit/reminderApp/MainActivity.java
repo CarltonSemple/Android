@@ -93,7 +93,7 @@ public class MainActivity extends ActionBarActivity
                 break;
             case 1:
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, UpcomingFragment.newInstance(position + 1))
+                        .replace(R.id.container, PastFragment.newInstance(position + 1))
                         .commit();
                 break;
             case 2:
@@ -110,7 +110,7 @@ public class MainActivity extends ActionBarActivity
     }
 
     /**
-     * Called by UpcomingFragment's onAttach().  Update title of action bar
+     * Called by Fragment's onAttach().  Update title of action bar
      * @param number
      */
     public void onSectionAttached(int number) {

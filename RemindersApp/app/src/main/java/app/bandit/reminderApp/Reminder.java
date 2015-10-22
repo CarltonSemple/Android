@@ -1,5 +1,9 @@
 package app.bandit.reminderApp;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by Carlton Semple on 9/27/2015.
  */
@@ -133,7 +137,7 @@ public class Reminder {
     }
 
     public String getMonthString() {
-        switch (month) {
+        switch (month + 1) {
             case 1:
                 return "Jan";
             case 2:
@@ -186,5 +190,45 @@ public class Reminder {
         }
 
         return sb.toString();
+    }
+
+    public Long getTimeMillis() throws ParseException {
+        return getTimeMillisGiven(year, month, day, hour, minute);
+    }
+
+    public static Long getTimeMillisGiven(Integer year,
+                                          Integer month,
+                                          Integer day,
+                                          Integer hour,
+                                          Integer minute) throws ParseException {
+        StringBuilder sb = new StringBuilder();
+        if (day < 10) {
+            sb.append('0');
+        }
+        sb.append(day);
+        sb.append('/');
+        if (month + 1 < 10) {
+            sb.append('0');
+        }
+        sb.append(month + 1);
+        sb.append('/');
+        sb.append(year);
+        sb.append(' ');
+        if (hour < 10) {
+            sb.append('0');
+        }
+        sb.append(hour);
+        sb.append(':');
+        if (minute < 10) {
+            sb.append('0');
+        }
+        sb.append(minute);
+        sb.append(':');
+        sb.append("00");
+
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+        Date dueDate = format.parse(sb.toString());
+
+        return dueDate.getTime();
     }
 }
