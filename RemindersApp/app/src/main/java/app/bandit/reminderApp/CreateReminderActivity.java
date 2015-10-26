@@ -11,9 +11,11 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -35,18 +37,21 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-import app.bandit.reminderApp.R;
 import app.bandit.reminderApp.background.ReminderService;
 import app.bandit.reminderApp.fileIO.JobFileManager;
+import app.bandit.reminderApp.reminders.Reminder;
 
 public class CreateReminderActivity extends ActionBarActivity implements View.OnClickListener {
 
     private EditText titleEdit, dateText, timeText, detailsText;
-    private Button submitButton;
+    private Button submitButton, cancelButton;
 
     private Manager manager;
     private Database db;
     final String TAG = "CreateReminderActivity";
+
+    /* Text Changed Listeners */
+    TextWatcher titleTextWatcher, detailTextWatcher;
 
     private Reminder reminder;
 
@@ -83,7 +88,8 @@ public class CreateReminderActivity extends ActionBarActivity implements View.On
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_reminder);
+        setContentView(R.layout.popup_reminder_edit);
+        setTitle("Create Reminder");
 
         jobManager = new JobFileManager(getFilesDir());
 
@@ -92,12 +98,34 @@ public class CreateReminderActivity extends ActionBarActivity implements View.On
         timeText = (EditText) findViewById(R.id.timeText);
         detailsText = (EditText) findViewById(R.id.detailsText);
         submitButton = (Button) findViewById(R.id.submitButton);
+        cancelButton = (Button) findViewById(R.id.deleteButton);
+        cancelButton.setText("CANCEL");
         reminder = new Reminder();
+
+        //setOnClick();
+        //setOnTextChanged();
+
+        openDatabase();
+
+        // Give the time and date fields initial values
+        initializeTimeAndDate();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
 
         setOnClick();
         setOnTextChanged();
+    }
 
-        openDatabase();
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        removeOnClick();
+        titleEdit.removeTextChangedListener(titleTextWatcher);
+        detailsText.removeTextChangedListener(detailTextWatcher);
     }
 
     /**
@@ -107,13 +135,21 @@ public class CreateReminderActivity extends ActionBarActivity implements View.On
         dateText.setOnClickListener(this);
         timeText.setOnClickListener(this);
         submitButton.setOnClickListener(this);
+        cancelButton.setOnClickListener(this);
+    }
+
+    protected void removeOnClick() {
+        dateText.setOnClickListener(null);
+        timeText.setOnClickListener(null);
+        submitButton.setOnClickListener(null);
+        cancelButton.setOnClickListener(null);
     }
 
     /**
      * Prepare the title and details fields for handling user input
      */
     protected void setOnTextChanged() {
-        titleEdit.addTextChangedListener(new TextWatcher() {
+        titleTextWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -126,9 +162,11 @@ public class CreateReminderActivity extends ActionBarActivity implements View.On
             @Override
             public void afterTextChanged(Editable s) {
             }
-        });
+        };
 
-        detailsText.addTextChangedListener(new TextWatcher() {
+        titleEdit.addTextChangedListener(titleTextWatcher);
+
+        detailTextWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -141,7 +179,9 @@ public class CreateReminderActivity extends ActionBarActivity implements View.On
             @Override
             public void afterTextChanged(Editable s) {
             }
-        });
+        };
+
+        detailsText.addTextChangedListener(detailTextWatcher);
     }
 
     /**
@@ -167,6 +207,11 @@ public class CreateReminderActivity extends ActionBarActivity implements View.On
                 // Go back to the Main Activity
                 Intent intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
+                break;
+            case R.id.deleteButton:
+                // Go back to the Main Activity
+                Intent intent2 = new Intent(this, MainActivity.class);
+                startActivity(intent2);
                 break;
         }
     }
@@ -216,6 +261,14 @@ public class CreateReminderActivity extends ActionBarActivity implements View.On
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Set the time and date to the current time/date
+     */
+    private void initializeTimeAndDate() {
+        updateDate();
+        updateTime();
     }
 
     /**

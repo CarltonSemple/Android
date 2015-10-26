@@ -20,7 +20,8 @@ import app.bandit.reminderApp.floatingactionbuttonbasic.FloatingActionButton;
  * Created by Carlton Semple on 9/27/2015.
  */
 public class MainActivity extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, View.OnClickListener, FloatingActionButton.OnCheckedChangeListener {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, //View.OnClickListener,
+        FloatingActionButton.OnCheckedChangeListener {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -33,6 +34,8 @@ public class MainActivity extends ActionBarActivity
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
+
+    private FloatingActionButton fab1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,13 +72,29 @@ public class MainActivity extends ActionBarActivity
         };
 
         //mDrawerToggle.syncState();
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
 
         /* Set up click listeners for buttons */
         //Button createButton = (Button)findViewById(R.id.createButton);
         //createButton.setOnClickListener(this);
-        FloatingActionButton fab1 = (FloatingActionButton) findViewById(R.id.fab_1);
+        fab1 = (FloatingActionButton) findViewById(R.id.fab_1);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
         fab1.setOnCheckedChangeListener(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        mDrawerLayout.setDrawerListener(null);
+        fab1.setOnCheckedChangeListener(null);
     }
 
     /**
@@ -195,15 +214,11 @@ public class MainActivity extends ActionBarActivity
      * Handle button clicks for this activity
      * @param v
      */
+    /*
     public void onClick(View v){
-        switch (v.getId()){/*
-            case R.id.createButton:
-                // Start activity without passing any variables
-                Intent intent = new Intent(this, CreateReminderActivity.class);
-                startActivity(intent);
-                break;*/
+        switch (v.getId()){
         }
-    }
+    }*/
 
     /**
      * Handle when the Floating Action Button is checked.  Go to the create reminder activity

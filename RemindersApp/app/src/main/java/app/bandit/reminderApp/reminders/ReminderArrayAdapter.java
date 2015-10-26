@@ -1,4 +1,4 @@
-package app.bandit.reminderApp;
+package app.bandit.reminderApp.reminders;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,6 +8,9 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+
+import app.bandit.reminderApp.R;
+import app.bandit.reminderApp.reminders.Reminder;
 
 /**
  * Created by Carlton Semple on 9/27/2015.
@@ -28,13 +31,13 @@ public class ReminderArrayAdapter extends ArrayAdapter<Reminder> {
         }
         // Lookup view for data population
         TextView title = (TextView) convertView.findViewById(R.id.row_main_text);
-        TextView monthDay = (TextView) convertView.findViewById(R.id.row_month_day);
-        TextView hourMinute = (TextView) convertView.findViewById(R.id.row_time);
+        TextView monthDayTime = (TextView) convertView.findViewById(R.id.row_month_day);
+        TextView details = (TextView) convertView.findViewById(R.id.row_detail_text);
 
         // Populate the data into the template view using the data object
         title.setText(reminder.getTitle());
-        monthDay.setText(reminder.getMonthDay() + ",");
-        hourMinute.setText(reminder.getTimeOfDay());
+        monthDayTime.setText(reminder.getMonthDayPlain() + ", " + reminder.getTimeOfDay());
+        details.setText(reminder.getDetails());
 
         // Return the completed view to render on screen
         return convertView;

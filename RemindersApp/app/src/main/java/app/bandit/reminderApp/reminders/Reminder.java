@@ -1,4 +1,6 @@
-package app.bandit.reminderApp;
+package app.bandit.reminderApp.reminders;
+
+import android.hardware.usb.UsbAccessory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -8,6 +10,7 @@ import java.util.Date;
  * Created by Carlton Semple on 9/27/2015.
  */
 public class Reminder {
+    private String id; // couchbase lite id
     private int year;
     private int month;
     private int day;
@@ -30,11 +33,28 @@ public class Reminder {
         repeat = false;
     }
 
-    public Reminder(int yp, int mp, int dp, int hp, int minp, String tp, String det, String stat, boolean reepeet) {
-        year = yp;
-        month = mp;
-        day = hp;
-        hour = hp;
+    public Reminder(int yearp, int monthp, int dayp, int hourp, int minp, String tp, String det, String stat, boolean reepeet) {
+        year = yearp;
+        month = monthp;
+        day = dayp;
+        hour = hourp;
+        minute = minp;
+        title = new StringBuilder(tp);
+        details = new StringBuilder(det);
+        if(stat.equals("upcoming")) {
+            status = ReminderStatus.UPCOMING;
+        } else if (stat.equals("past")) {
+            status = ReminderStatus.PAST;
+        }
+        repeat = reepeet;
+    }
+
+    public Reminder(String nId, int yearp, int monthp, int dayp, int hourp, int minp, String tp, String det, String stat, boolean reepeet) {
+        id = nId;
+        year = yearp;
+        month = monthp;
+        day = dayp;
+        hour = hourp;
         minute = minp;
         title = new StringBuilder(tp);
         details = new StringBuilder(det);
@@ -68,6 +88,10 @@ public class Reminder {
 
     public int getHour() {
         return hour;
+    }
+
+    public String getId() {
+        return this.id;
     }
 
     public int getMinute() {
@@ -133,6 +157,15 @@ public class Reminder {
         } else {
             sb.append("th");
         }
+        return sb.toString();
+    }
+
+    /* Get the Month & Day without a 2 letter ending */
+    public String getMonthDayPlain() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getMonthString());
+        sb.append(' ');
+        sb.append(day);
         return sb.toString();
     }
 

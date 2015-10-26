@@ -1,14 +1,15 @@
 package app.bandit.reminderApp;
 
 import android.app.Activity;
-import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.couchbase.lite.CouchbaseLiteException;
@@ -33,6 +34,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import app.bandit.reminderApp.reminders.Reminder;
+import app.bandit.reminderApp.reminders.ReminderArrayAdapter;
+
 /**
  * A fragment containing a list view of upcoming reminders.
  *
@@ -50,6 +54,11 @@ public class UpcomingFragment extends android.support.v4.app.Fragment
     private Database db;
     final String TAG = "UpcomingFragment";
     private final String db_name = "reminders";
+
+    /** Components Inside Edit Dialog **/
+
+    private EditText titleEdit, dateText, timeText, detailsText;
+    private Button submitButton;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -74,7 +83,7 @@ public class UpcomingFragment extends android.support.v4.app.Fragment
 
         /* Get the database */
         try {
-            getDatabase(rootView, db_name);
+            getDatabase(rootView.getContext(), db_name);
         } catch (Exception e) {
             e.printStackTrace();
             return  rootView;
@@ -128,10 +137,12 @@ public class UpcomingFragment extends android.support.v4.app.Fragment
                 int hour = (int) rDoc.getProperty("hour");
                 int minute = (int) rDoc.getProperty("minute");
                 String ti = (String) rDoc.getProperty("title");
+                String details = (String) rDoc.getProperty("details");
                 String status = (String) rDoc.getProperty("status");
                 boolean repeat = (boolean) rDoc.getProperty("repeat");
 
-                reminders.add(new Reminder(year, month, day, hour, minute, ti, "", status, repeat));
+
+                reminders.add(new Reminder(rDoc.getId(), year, month, day, hour, minute, ti, details, status, repeat));
             }
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
@@ -140,8 +151,11 @@ public class UpcomingFragment extends android.support.v4.app.Fragment
             int i = 0;
         }
 
+        /* Free database resource */
+        closeDatabaseConnection(manager, db);
+
         /* Fill Item List */
-        ReminderArrayAdapter arrayAdapter = new ReminderArrayAdapter(getActivity(), reminders);
+        final ReminderArrayAdapter arrayAdapter = new ReminderArrayAdapter(getActivity(), reminders);
         ListView itemslist = (ListView) rootView.findViewById(R.id.upcomingListView);
         itemslist.setAdapter(arrayAdapter);
 
@@ -149,13 +163,13 @@ public class UpcomingFragment extends android.support.v4.app.Fragment
         itemslist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-                final Dialog dialog = new Dialog(rootView.getContext());
-                dialog.setContentView(R.layout.popup_reminder_edit);
-                dialog.setTitle("edit reminder");
+                Reminder selectedReminder = arrayAdapter.getItem(arg2); // get the item at arg2 index
+                final EditDialog dialog = new EditDialog(rootView.getContext(), selectedReminder, arrayAdapter);
+                //dialog.
                 dialog.show();
             }
-
         });
+
 
 
         return rootView;
@@ -192,16 +206,16 @@ public class UpcomingFragment extends android.support.v4.app.Fragment
 
     /**
      * Start the database manager, and open the database
-     * @param rootView
+     * @param context
      * @throws Exception
      */
-    private void getDatabase(View rootView, String dbName) throws Exception {
+    private void getDatabase(Context context, String dbName) throws Exception {
         /*
          * Start database manager
          */
         try {
             // Create manager
-            manager = new Manager(new AndroidContext(rootView.getContext()), Manager.DEFAULT_OPTIONS);
+            manager = new Manager(new AndroidContext(context), Manager.DEFAULT_OPTIONS);
             Log.i(TAG, "manager created");
         } catch (IOException e) {
             Log.e(TAG, "Cannot create Manager instance", e);
@@ -219,6 +233,14 @@ public class UpcomingFragment extends android.support.v4.app.Fragment
         }
     }
 
+    /**
+     *
+     */
+    private void closeDatabaseConnection(Manager dbManager, Database database) {
+        dbManager.close();
+        database.close();
+    }
+
     private void setUpcomingMappingFunction(com.couchbase.lite.View cview) {
         cview.setMap(new Mapper() {
                  @Override
@@ -226,10 +248,18 @@ public class UpcomingFragment extends android.support.v4.app.Fragment
                      /* Check to see if the reminder is upcoming still or not */
 
                      try {
-                         Long dueTime = Reminder.getTimeMillisGiven((int) document.get("year"), (int) document.get("month") - 1, (int) document.get("day"), (int) document.get("hour"), (int) document.get("minute"));
+                         int year = (int)document.get("year");
+                         int month = (int)document.get("month");
+                         int day = (int)document.get("day");
+                         int hour = (int)document.get("hour");
+                         int minute = (int)document.get("minute");
+                         Long dueTime = Reminder.getTimeMillisGiven(year, month, day, hour, minute);
                          java.util.Date cur = new GregorianCalendar().getTime();
                          TimeZone zone = Calendar.getInstance().getTimeZone();
                          Long current = cur.getTime();
+                         /*Reminder nre = new Reminder(year, month, day, hour, minute,
+                                 (String)document.get("title"), (String)document.get("details"), (String)document.get("status"), false);
+                         String s = nre.getMonthDay() + " " + nre.getYear();*/
                          if (dueTime >= current) { // Still upcoming if the due time is larger than the current time
                              List<Object> key = new ArrayList<Object>();
                              key.add(document.get("year"));

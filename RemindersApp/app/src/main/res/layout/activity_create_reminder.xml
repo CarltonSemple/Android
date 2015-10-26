@@ -1,85 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="app.bandit.reminderApp.CreateReminderActivity">
-
-    <TextView android:text="Add a reminder" android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Title"
-        android:id="@+id/titleTitle"
-        android:layout_below="@+id/textView"
-        android:paddingTop="15dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:textSize="10sp" />
+    android:layout_width="wrap_content" android:layout_height="wrap_content"
+    android:background="@android:color/white">
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:id="@+id/titleEditView"
-        android:layout_below="@+id/titleTitle"
+        android:id="@+id/create_titleEditView"
         android:paddingTop="15dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:hint="Title"/>
+        android:hint="Title"
+        android:textSize="25sp" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="date"
         android:ems="10"
-        android:id="@+id/dateText"
-        android:layout_below="@+id/titleEditView"
+        android:id="@+id/create_dateText"
+        android:layout_below="@+id/create_titleEditView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:hint="date"
-        android:focusable="false" />
+        android:focusable="false"
+        android:layout_alignParentEnd="true" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="time"
         android:ems="10"
-        android:id="@+id/timeText"
-        android:layout_below="@+id/dateText"
+        android:id="@+id/create_timeText"
+        android:layout_below="@+id/create_dateText"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:hint="time"
-        android:focusable="false" />
-
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="OK"
-        android:id="@+id/submitButton"
-        android:layout_below="@+id/timeText"
-        android:layout_alignRight="@+id/titleEditView"
-        android:layout_alignEnd="@+id/titleEditView" />
+        android:focusable="false"
+        android:layout_alignParentEnd="true" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"
         android:ems="10"
-        android:id="@+id/detailsText"
+        android:id="@+id/create_detailsText"
         android:hint="(optional) details"
-        android:layout_below="@+id/submitButton"
+        android:layout_below="@+id/create_timeText"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true">
+
+        <!-- Delete Button -->
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:layout_gravity="bottom"
+            android:id="@+id/create_cancelButton"
+            android:text="delete"
+            android:background="@drawable/delete_color"/>
+
+        <!-- Submit Button -->
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:layout_gravity="bottom"
+            android:text="OK"
+            android:background="@drawable/red_color"
+            android:id="@+id/create_submitButton"/>
+    </LinearLayout>
 
 </RelativeLayout>
